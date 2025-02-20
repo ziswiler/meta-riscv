@@ -1,0 +1,16 @@
+Upstream-Status: Inappropriate [Other]
+---
+
+diff --git a/arch/riscv/configs/k1_defconfig b/arch/riscv/configs/k1_defconfig
+index a2b6a46ae3..79f50271d0 100644
+--- a/arch/riscv/configs/k1_defconfig
++++ b/arch/riscv/configs/k1_defconfig
+@@ -345,8 +345,6 @@ CONFIG_USB_NET_ASIX=m
+ # CONFIG_WLAN_VENDOR_MICROCHIP is not set
+ # CONFIG_WLAN_VENDOR_PURELIFI is not set
+ # CONFIG_WLAN_VENDOR_RALINK is not set
+-CONFIG_RTL8852BS=m
+-CONFIG_RTL8852BE=m
+ # CONFIG_WLAN_VENDOR_RSI is not set
+ # CONFIG_WLAN_VENDOR_SILABS is not set
+ # CONFIG_WLAN_VENDOR_ST is not set
