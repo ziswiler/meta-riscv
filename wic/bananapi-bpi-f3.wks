@@ -1,0 +1,15 @@
+# short-description: Create SD card image for Banana Pi BPI-F3 development board
+# see https://bianbu-linux.spacemit.com/en/device/boot
+
+#bootloader --ptable msdos
+#ERROR: Could not place sda1 at offset 0: next free sector is 1 (delta: -1)
+bootloader --ptable gpt
+#ERROR: Could not place sda1 at offset 0: next free sector is 34 (delta: -34)
+#part bootinfo --source rawcopy --sourceparams="file=bootinfo_sd.bin" --ondisk sda --no-table --align 0 --offset 0S
+part fsbl --source rawcopy --sourceparams="file=FSBL.bin" --part-name fsbl --offset 256S --size 256K
+part env --source rawcopy --sourceparams="file=u-boot-env-default.bin" --part-name env --offset 768S --size 64K
+#opensbi: fw_dynamic.itb?
+part opensbi --source rawcopy --sourceparams="file=fw_dynamic.bin" --part-name opensbi --offset=2048S --size 1M
+part uboot --source rawcopy --sourceparams="file=u-boot.itb" --part-name uboot --offset 4096S --size 2M
+part /boot --source bootimg-partition --fstype=ext4 --label bootfs --active --align 1024 --use-uuid --fixed-size 256M
+part / --source rootfs --fstype=ext4 --label rootfs --align 1024 --use-uuid --size 2G
