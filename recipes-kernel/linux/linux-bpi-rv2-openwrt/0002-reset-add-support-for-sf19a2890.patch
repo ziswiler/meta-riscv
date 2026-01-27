@@ -1,0 +1,50 @@
+From 2804a96d0b63525d3349db2ba3ec5f90c2e041ab Mon Sep 17 00:00:00 2001
+Message-ID: <2804a96d0b63525d3349db2ba3ec5f90c2e041ab.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: Chuanhong Guo <gch981213@gmail.com>
+Date: Tue, 20 Aug 2024 08:33:43 +0800
+Subject: [PATCH 02/18] reset: add support for sf19a2890
+
+Signed-off-by: Chuanhong Guo <gch981213@gmail.com>
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ drivers/reset/Kconfig  | 8 ++++++++
+ drivers/reset/Makefile | 1 +
+ 2 files changed, 9 insertions(+)
+
+diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
+index 1cf577e3223b..5158680cc9f5 100644
+--- a/drivers/reset/Kconfig
++++ b/drivers/reset/Kconfig
+@@ -242,6 +242,14 @@ config RESET_SCMI
+ 	  This driver uses SCMI Message Protocol to interact with the
+ 	  firmware controlling all the reset signals.
+ 
++config RESET_SF19A2890_PERIPH
++	bool "Siflower SF19A2890 Peripheral Reset Controller Driver"
++	default MACH_SIFLOWER_MIPS
++	depends on HAS_IOMEM
++	help
++	  This enables reset controller driver for peripheral reset blocks
++	  found on Siflower SF19A2890 SoC.
++
+ config RESET_SIMPLE
+ 	bool "Simple Reset Controller Driver" if COMPILE_TEST || EXPERT
+ 	default ARCH_ASPEED || ARCH_BCMBCA || ARCH_BITMAIN || ARCH_REALTEK || ARCH_SOPHGO || ARCH_STM32 || (ARCH_INTEL_SOCFPGA && ARM64) || ARCH_SUNXI || ARC
+diff --git a/drivers/reset/Makefile b/drivers/reset/Makefile
+index 4411a2a124d7..1d53336431cb 100644
+--- a/drivers/reset/Makefile
++++ b/drivers/reset/Makefile
+@@ -32,6 +32,7 @@ obj-$(CONFIG_RESET_QCOM_PDC) += reset-qcom-pdc.o
+ obj-$(CONFIG_RESET_RASPBERRYPI) += reset-raspberrypi.o
+ obj-$(CONFIG_RESET_RZG2L_USBPHY_CTRL) += reset-rzg2l-usbphy-ctrl.o
+ obj-$(CONFIG_RESET_SCMI) += reset-scmi.o
++obj-$(CONFIG_RESET_SF19A2890_PERIPH) += reset-sf19a2890-periph.o
+ obj-$(CONFIG_RESET_SIMPLE) += reset-simple.o
+ obj-$(CONFIG_RESET_SOCFPGA) += reset-socfpga.o
+ obj-$(CONFIG_RESET_SUNPLUS) += reset-sunplus.o
+-- 
+2.49.0
+

@@ -1,0 +1,49 @@
+From 6f2effb54ba2a917a4686aad47409d97a527ed90 Mon Sep 17 00:00:00 2001
+Message-ID: <6f2effb54ba2a917a4686aad47409d97a527ed90.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: Chuanhong Guo <gch981213@gmail.com>
+Date: Tue, 20 Aug 2024 08:34:42 +0800
+Subject: [PATCH 05/18] stmmac: add support for sf19a2890
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ drivers/net/ethernet/stmicro/stmmac/Kconfig  | 9 +++++++++
+ drivers/net/ethernet/stmicro/stmmac/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index 05cc07b8f48c..3f1688b949ec 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -154,6 +154,15 @@ config DWMAC_RZN1
+ 	  the stmmac device driver. This support can make use of a custom MII
+ 	  converter PCS device.
+ 
++config DWMAC_SF19A2890
++	tristate "Siflower SF19A2890 GMAC support"
++	default MACH_SIFLOWER_MIPS
++	help
++	  Support for GMAC on Siflower SF19A2890 SoC.
++
++	  This selects the Siflower SF19A2890 SoC glue layer support for
++	  the stmmac device driver.
++
+ config DWMAC_SOCFPGA
+ 	tristate "SOCFPGA dwmac support"
+ 	default ARCH_INTEL_SOCFPGA
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+index c2f0e91f6bf8..4b3ca2461a27 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Makefile
++++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+@@ -21,6 +21,7 @@ obj-$(CONFIG_DWMAC_MEDIATEK)	+= dwmac-mediatek.o
+ obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
+ obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
+ obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
++obj-$(CONFIG_DWMAC_SF19A2890)	+= dwmac-sf19a2890.o
+ obj-$(CONFIG_DWMAC_RZN1)	+= dwmac-rzn1.o
+ obj-$(CONFIG_DWMAC_SOCFPGA)	+= dwmac-altr-socfpga.o
+ obj-$(CONFIG_DWMAC_STARFIVE)	+= dwmac-starfive.o
+-- 
+2.49.0
+

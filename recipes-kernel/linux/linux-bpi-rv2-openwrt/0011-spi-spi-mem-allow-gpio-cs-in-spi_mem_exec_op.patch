@@ -1,0 +1,52 @@
+From c6c74557ac3ca579d170053730ad304c640197c4 Mon Sep 17 00:00:00 2001
+Message-ID: <c6c74557ac3ca579d170053730ad304c640197c4.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: Chuanhong Guo <gch981213@gmail.com>
+Date: Thu, 19 Sep 2024 09:23:27 +0800
+Subject: [PATCH 11/18] spi: spi-mem: allow gpio cs in spi_mem_exec_op
+
+spi_mem_exec_op can use gpio cs, either by not asserting the native
+cs or switching the native cs pin to GPIO mode with pinctrl.
+
+Allow calling exec_op when GPIO CS present and control GPIO CS
+before and after calling exec_op.
+If exec_op decided to return -EOPNOTSUPP, the code will assert and
+deassert GPIO CS without clock pulsing, which should be fine on most
+SPI slaves.
+
+Signed-off-by: Chuanhong Guo <gch981213@gmail.com>
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ drivers/spi/spi-mem.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/spi/spi-mem.c b/drivers/spi/spi-mem.c
+index 96374afd0193..28efa33bffe9 100644
+--- a/drivers/spi/spi-mem.c
++++ b/drivers/spi/spi-mem.c
+@@ -384,13 +384,19 @@ int spi_mem_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
+ 	if (!spi_mem_internal_supports_op(mem, op))
+ 		return -EOPNOTSUPP;
+ 
+-	if (ctlr->mem_ops && ctlr->mem_ops->exec_op && !spi_get_csgpiod(mem->spi, 0)) {
++	if (ctlr->mem_ops && ctlr->mem_ops->exec_op) {
+ 		ret = spi_mem_access_start(mem);
+ 		if (ret)
+ 			return ret;
+ 
++		if (spi_get_csgpiod(mem->spi, 0))
++			gpiod_set_value_cansleep(spi_get_csgpiod(mem->spi, 0), 1);
++
+ 		ret = ctlr->mem_ops->exec_op(mem, op);
+ 
++		if (spi_get_csgpiod(mem->spi, 0))
++			gpiod_set_value_cansleep(spi_get_csgpiod(mem->spi, 0), 0);
++
+ 		spi_mem_access_end(mem);
+ 
+ 		/*
+-- 
+2.49.0
+

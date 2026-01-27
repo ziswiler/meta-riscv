@@ -1,0 +1,1375 @@
+From df51f9db288335c5180244a3807931bf42b424d5 Mon Sep 17 00:00:00 2001
+Message-ID: <df51f9db288335c5180244a3807931bf42b424d5.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: Marcel Ziswiler <marcel@ziswiler.com>
+Date: Mon, 26 Jan 2026 09:52:15 +0100
+Subject: [PATCH 18/18] Add siflower risc-v device trees from openwrt
+
+Signed-off-by: Marcel Ziswiler <marcel@ziswiler.com>
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ arch/riscv/boot/dts/siflower/sf21.dtsi        | 863 ++++++++++++++++++
+ arch/riscv/boot/dts/siflower/sf21a6826.dtsi   |  23 +
+ arch/riscv/boot/dts/siflower/sf21h8898.dtsi   |  39 +
+ .../sf21h8898_bananapi_bpi-rv2-nand.dts       |  90 ++
+ .../sf21h8898_bananapi_bpi-rv2-nor.dts        |  80 ++
+ .../siflower/sf21h8898_bananapi_bpi-rv2.dtsi  | 215 +++++
+ 6 files changed, 1310 insertions(+)
+ create mode 100644 arch/riscv/boot/dts/siflower/sf21.dtsi
+ create mode 100644 arch/riscv/boot/dts/siflower/sf21a6826.dtsi
+ create mode 100644 arch/riscv/boot/dts/siflower/sf21h8898.dtsi
+ create mode 100644 arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nand.dts
+ create mode 100644 arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nor.dts
+ create mode 100644 arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2.dtsi
+
+diff --git a/arch/riscv/boot/dts/siflower/sf21.dtsi b/arch/riscv/boot/dts/siflower/sf21.dtsi
+new file mode 100644
+index 000000000000..1488200a4658
+--- /dev/null
++++ b/arch/riscv/boot/dts/siflower/sf21.dtsi
+@@ -0,0 +1,863 @@
++/*
++ * Copyright 2023 SiFlower Corporation.
++ */
++
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/pinctrl/siflower,sf21-iomux.h>
++#include <dt-bindings/clock/siflower,sf21-topcrm.h>
++#include <dt-bindings/reset/siflower,sf21-reset.h>
++
++/ {
++	#address-cells = <2>;
++	#size-cells = <2>;
++
++	aliases {
++		serial0 = &uart0;
++		serial1 = &uart1;
++	};
++
++
++	cpus: cpus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		cpu@0 {
++			compatible = "riscv";
++			device_type = "cpu";
++			riscv,isa = "rv64imafdc_svpbmt_zba_zbb_zbc_zbs_zicbom_zicbop_zicboz";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c",
++						"sstc", "svinval", "svnapot", "svpbmt", "zba", "zbb", "zbc", "zbs", "zfh", "zicbom", "zicbop", "zicboz", "zicntr", "zicsr", "zifencei", "zihintpause", "zihpm";
++			reg = <0>;
++			i-cache-block-size = <64>;
++			i-cache-size = <32768>;
++			i-cache-sets = <128>;
++			d-cache-block-size = <64>;
++			d-cache-size = <32768>;
++			d-cache-sets = <128>;
++			riscv,cbom-block-size = <64>;
++			riscv,cbop-block-size = <64>;
++			riscv,cboz-block-size = <64>;
++			clocks = <&topcrm CLK_CPU>;
++			next-level-cache = <&l2_cache>;
++			mmu-type = "riscv,sv39";
++
++			cpu0_intc: interrupt-controller {
++				#interrupt-cells = <1>;
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++			};
++		};
++
++		cpu@1 {
++			compatible = "riscv";
++			device_type = "cpu";
++			riscv,isa = "rv64imafdc_svpbmt_zba_zbb_zbc_zbs_zicbom_zicbop_zicboz";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c",
++						"sstc", "svinval", "svnapot", "svpbmt", "zba", "zbb", "zbc", "zbs", "zfh", "zicbom", "zicbop", "zicboz", "zicntr", "zicsr", "zifencei", "zihintpause", "zihpm";
++			reg = <1>;
++			i-cache-block-size = <64>;
++			i-cache-size = <32768>;
++			i-cache-sets = <128>;
++			d-cache-block-size = <64>;
++			d-cache-size = <32768>;
++			d-cache-sets = <128>;
++			riscv,cbom-block-size = <64>;
++			riscv,cbop-block-size = <64>;
++			riscv,cboz-block-size = <64>;
++			clocks = <&topcrm CLK_CPU>;
++			next-level-cache = <&l2_cache>;
++			mmu-type = "riscv,sv39";
++
++			cpu1_intc: interrupt-controller {
++				#interrupt-cells = <1>;
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++			};
++		};
++
++		cpu@2 {
++			compatible = "riscv";
++			device_type = "cpu";
++			riscv,isa = "rv64imafdc_svpbmt_zba_zbb_zbc_zbs_zicbom_zicbop_zicboz";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c",
++						"sstc", "svinval", "svnapot", "svpbmt", "zba", "zbb", "zbc", "zbs", "zfh", "zicbom", "zicbop", "zicboz", "zicntr", "zicsr", "zifencei", "zihintpause", "zihpm";
++			reg = <2>;
++			i-cache-block-size = <64>;
++			i-cache-size = <32768>;
++			i-cache-sets = <128>;
++			d-cache-block-size = <64>;
++			d-cache-size = <32768>;
++			d-cache-sets = <128>;
++			riscv,cbom-block-size = <64>;
++			riscv,cbop-block-size = <64>;
++			riscv,cboz-block-size = <64>;
++			clocks = <&topcrm CLK_CPU>;
++			next-level-cache = <&l2_cache>;
++			mmu-type = "riscv,sv39";
++
++			cpu2_intc: interrupt-controller {
++				#interrupt-cells = <1>;
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++			};
++		};
++
++		cpu@3 {
++			compatible = "riscv";
++			device_type = "cpu";
++			riscv,isa = "rv64imafdc_svpbmt_zba_zbb_zbc_zbs_zicbom_zicbop_zicboz";
++			riscv,isa-base = "rv64i";
++			riscv,isa-extensions = "i", "m", "a", "f", "d", "c",
++						"sstc", "svinval", "svnapot", "svpbmt", "zba", "zbb", "zbc", "zbs", "zfh", "zicbom", "zicbop", "zicboz", "zicntr", "zicsr", "zifencei", "zihintpause", "zihpm";
++			reg = <3>;
++			i-cache-block-size = <64>;
++			i-cache-size = <32768>;
++			i-cache-sets = <128>;
++			d-cache-block-size = <64>;
++			d-cache-size = <32768>;
++			d-cache-sets = <128>;
++			riscv,cbom-block-size = <64>;
++			riscv,cbop-block-size = <64>;
++			riscv,cboz-block-size = <64>;
++			clocks = <&topcrm CLK_CPU>;
++			next-level-cache = <&l2_cache>;
++			mmu-type = "riscv,sv39";
++
++			cpu3_intc: interrupt-controller {
++				#interrupt-cells = <1>;
++				compatible = "riscv,cpu-intc";
++				interrupt-controller;
++			};
++		};
++
++		l2_cache: l2-cache {
++			compatible = "cache";
++			cache-level = <2>;
++			cache-block-size = <64>;
++			cache-size = <262144>;
++			cache-sets = <256>;
++			cache-unified;
++		};
++	};
++
++	xin25m: xin25m {
++		compatible = "fixed-clock";
++		clock-output-names = "xin25m";
++		clock-frequency = <25000000>;
++		#clock-cells = <0>;
++	};
++
++	pmu {
++		compatible = "riscv,pmu";
++		riscv,event-to-mhpmevent =
++			<0x00003 0x0 0x9b>, // L1 Dcache Access
++			<0x00004 0x0 0x9c>, // L1 Dcache Miss
++			<0x00005 0x0 0x36>, // Branch Instruction
++			<0x00006 0x0 0x38>, // Branch Mispred
++			<0x00008 0x0 0x27>, // Stalled Cycles Frontend
++			<0x00009 0x0 0x28>, // Stalled Cycles Backend
++			<0x10000 0x0 0x0c>, // L1-dcache load access
++			<0x10001 0x0 0x0d>, // L1-dcache load miss
++			<0x10002 0x0 0x0e>, // L1-dcache store access
++			<0x10003 0x0 0x0f>, // L1-dcache store miss
++			<0x10004 0x0 0xa2>, // Dcache Hit Caused by Prefetch
++			<0x10005 0x0 0xa1>, // Dcache Refill Caused by Prefetch
++			<0x10008 0x0 0x01>, // L1-icache Access
++			<0x10009 0x0 0x02>, // L1-icache Miss
++			<0x1000c 0x0 0x9e>, // Icache Prefetch
++			<0x1000d 0x0 0xa0>, // Icache Prefetch Miss
++			<0x10010 0x0 0xa5>, // L2 Access
++			<0x10011 0x0 0xa6>, // L2 Miss
++			<0x10019 0x0 0xa4>, // Load Dtlb Miss
++			<0x1001b 0x0 0xa3>, // Store Dtlb Miss
++			<0x10021 0x0 0x03>; // iTLB Miss
++		riscv,event-to-mhpmcounters =
++			<0x00001 0x00001 0x00000001>, // cycles
++			<0x00002 0x00002 0x00000004>, // instructions
++			<0x00003 0x1ffff 0xfffffff8>; // others
++		riscv,raw-event-to-mhpmcounters =
++			<0x0 0x0 0xffffffff 0xffffff00 0xfffffff8>;
++	};
++
++	timer: timer {
++		compatible = "riscv,timer";
++	};
++
++	reset: reset-controller {
++		compatible = "siflower,sf21-reset";
++		#reset-cells = <1>;
++		siflower,crm = <&topcrm>;
++	};
++
++	soc {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		compatible = "simple-bus";
++		dma-noncoherent;
++		ranges;
++		interrupt-parent = <&plic>;
++
++		pcie0: pcie@00200000 {
++			compatible = "siflower,sf21-pcie";
++			status = "disabled";
++			reg = <0x0 0x00000000 0x0 0x200000>,
++			      <0x0 0x00200000 0x0 0x100000>,
++			      <0x0 0x00300000 0x0 0x080000>,
++			      <0x0 0x00380000 0x0 0x080000>,
++			      <0x0 0xa0000000 0x0 0x080000>;
++			reg-names = "dbi", "elbi", "atu", "dma", "config";
++			clocks = <&topcrm CLK_SERDES_CSR>,
++				 <&topcrm CLK_PCIE_REFP>,
++				 <&topcrm CLK_PCIEPLL_FOUT3>;
++			clock-names = "csr", "ref", "phy";
++			#address-cells = <3>;
++			#size-cells = <2>;
++			device_type = "pci";
++			bus-range = <0x0 0xff>;
++			ranges = <0x81000000 0x0 0xa0080000 0x0 0xa0080000 0x0 0x00080000 /* downstream I/O 256KB */
++				  0x82000000 0x0 0xa0100000 0x0 0xa0100000 0x0 0x2ff00000>; /* non-prefetchable memory */
++			siflower,ctlr-idx = <0>;
++			num-viewport = <8>;
++			interrupts = <124 IRQ_TYPE_LEVEL_HIGH>,
++					<160 IRQ_TYPE_LEVEL_HIGH>, <161 IRQ_TYPE_LEVEL_HIGH>, <162 IRQ_TYPE_LEVEL_HIGH>, <163 IRQ_TYPE_LEVEL_HIGH>, <164 IRQ_TYPE_LEVEL_HIGH>, <165 IRQ_TYPE_LEVEL_HIGH>, <166 IRQ_TYPE_LEVEL_HIGH>, <167 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "intr", "msi0", "msi1", "msi2", "msi3", "msi4", "msi5", "msi6", "msi7";
++			#interrupt-cells = <1>;
++			interrupt-map-mask = <0 0 0 7>;
++			interrupt-map = <0 0 0 1 &plic 151 IRQ_TYPE_EDGE_RISING>,
++					<0 0 0 2 &plic 150 IRQ_TYPE_EDGE_RISING>,
++					<0 0 0 3 &plic 149 IRQ_TYPE_EDGE_RISING>,
++					<0 0 0 4 &plic 148 IRQ_TYPE_EDGE_RISING>;
++			siflower,pcie-sysm = <&pcie_phy>;
++			phys = <&pcie_phy0>;
++			linux,pci-domain = <0>;
++		};
++
++		pcie1: pcie@04200000 {
++			compatible = "siflower,sf21-pcie";
++			status = "disabled";
++			reg = <0x0 0x04000000 0x0 0x200000>,
++			      <0x0 0x04200000 0x0 0x100000>,
++			      <0x0 0x04300000 0x0 0x080000>,
++			      <0x0 0x04380000 0x0 0x080000>,
++			      <0x0 0xd0000000 0x0 0x080000>;
++			reg-names = "dbi", "elbi", "atu", "dma", "config";
++			clocks = <&topcrm CLK_SERDES_CSR>,
++				 <&topcrm CLK_PCIE_REFP>,
++				 <&topcrm CLK_PCIEPLL_FOUT3>;
++			clock-names = "csr", "ref", "phy";
++			#address-cells = <3>;
++			#size-cells = <2>;
++			device_type = "pci";
++			bus-range = <0x0 0xff>;
++			ranges = <0x81000000 0x0 0xd0080000 0x0 0xd0080000 0x0 0x00080000 /* downstream I/O 256KB */
++				  0x82000000 0x0 0xd0100000 0x0 0xd0100000 0x0 0x2ff00000>; /* non-prefetchable memory */
++			siflower,ctlr-idx = <1>;
++			num-viewport = <8>;
++			interrupts = <125 IRQ_TYPE_LEVEL_HIGH>,
++					<168 IRQ_TYPE_LEVEL_HIGH>, <169 IRQ_TYPE_LEVEL_HIGH>, <170 IRQ_TYPE_LEVEL_HIGH>, <171 IRQ_TYPE_LEVEL_HIGH>, <172 IRQ_TYPE_LEVEL_HIGH>, <173 IRQ_TYPE_LEVEL_HIGH>, <174 IRQ_TYPE_LEVEL_HIGH>, <175 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "intr", "msi0", "msi1", "msi2", "msi3", "msi4", "msi5", "msi6", "msi7";
++			#interrupt-cells = <1>;
++			interrupt-map-mask = <0 0 0 7>;
++			interrupt-map = <0 0 0 1 &plic 159 IRQ_TYPE_EDGE_RISING>,
++					<0 0 0 2 &plic 158 IRQ_TYPE_EDGE_RISING>,
++					<0 0 0 3 &plic 157 IRQ_TYPE_EDGE_RISING>,
++					<0 0 0 4 &plic 156 IRQ_TYPE_EDGE_RISING>;
++			siflower,pcie-sysm = <&pcie_phy>;
++			phys = <&pcie_phy1>;
++			linux,pci-domain = <1>;
++		};
++
++		topcrm: clock-controller@0ce00400 {
++			compatible = "siflower,sf21-topcrm", "syscon";
++			reg = <0x0 0x0ce00400 0x0 0x400>;
++			clocks = <&xin25m>;
++			clock-names = "xin25m";
++			#clock-cells = <1>;
++		};
++
++		i2crst: reset-controller@0ce08400 {
++			compatible = "siflower,sf19a2890-periph-reset";
++			reg = <0x0 0x0ce08400 0x0 0x4>;
++			#reset-cells = <1>;
++			siflower,num-resets = <2>;
++		};
++
++		i2cclk: clock-controller@0ce08404 {
++			compatible = "siflower,sf19a2890-periph-clk";
++			reg = <0x0 0x0ce08404 0x0 0x4>;
++			clocks = <&topcrm CLK_APB>, <&topcrm CLK_APB>;
++			clock-output-names = "i2c0", "i2c1";
++			#clock-cells = <1>;
++		};
++
++		spirst: reset-controller@0ce08800 {
++			compatible = "siflower,sf19a2890-periph-reset";
++			reg = <0x0 0x0ce08800 0x0 0x4>;
++			#reset-cells = <1>;
++			siflower,reset-masks = <0x3 0xc>;
++		};
++
++		spiclk: clock-controller@0ce08804 {
++			compatible = "siflower,sf19a2890-periph-clk";
++			reg = <0x0 0x0ce08804 0x0 0x4>;
++			clocks = <&topcrm CLK_APB>, <&topcrm CLK_APB>, <&topcrm CLK_APB>,
++				 <&topcrm CLK_APB>;
++			clock-output-names = "spi0_apb", "spi0_ssp", "spi1_apb",
++					     "spi1_ssp";
++			#clock-cells = <1>;
++		};
++
++		uartrst: reset-controller@0ce08c00 {
++			compatible = "siflower,sf19a2890-periph-reset";
++			reg = <0x0 0x0ce08c00 0x0 0x4>;
++			#reset-cells = <1>;
++			siflower,reset-masks = <0x11 0x22>;
++		};
++
++		uartclk: clock-controller@0ce08c04 {
++			compatible = "siflower,sf19a2890-periph-clk";
++			reg = <0x0 0x0ce08c04 0x0 0x4>;
++			clocks = <&topcrm CLK_APB>, <&topcrm CLK_APB>,
++				 <&topcrm CLK_UART>, <&topcrm CLK_UART>;
++			clock-output-names = "uart0_apb", "uart1_apb",
++					     "uart0", "uart1";
++			siflower,valid-gates = <0x33>;
++			siflower,critical-gates = <0x22>;
++			#clock-cells = <1>;
++		};
++
++		timerst: reset-controller@0ce09800 {
++			compatible = "siflower,sf19a2890-periph-reset";
++			reg = <0x0 0x0ce09800 0x0 0x4>;
++			#reset-cells = <1>;
++			siflower,reset-masks = <0x1>;
++		};
++
++		timerclk: clock-controller@0ce09804 {
++			compatible = "siflower,sf19a2890-periph-clk";
++			reg = <0x0 0x0ce09804 0x0 0x4>;
++			clocks = <&topcrm CLK_APB>;
++			clock-output-names = "timer";
++			#clock-cells = <1>;
++		};
++
++		wdtrst: reset-controller@0ce09c00 {
++			compatible = "siflower,sf19a2890-periph-reset";
++			reg = <0x0 0x0ce09c00 0x0 0x4>;
++			#reset-cells = <1>;
++			siflower,reset-masks = <0x1>;
++		};
++
++		wdtclk: clock-controller@0ce09c04 {
++			compatible = "siflower,sf19a2890-periph-clk";
++			reg = <0x0 0x0ce09c04 0x0 0x4>;
++			clocks = <&topcrm CLK_APB>;
++			clock-output-names = "wdt";
++			#clock-cells = <1>;
++		};
++
++		gpiorst: reset-controller@0ce0a000 {
++			compatible = "siflower,sf19a2890-periph-reset";
++			reg = <0x0 0x0ce0a000 0x0 0x4>;
++			#reset-cells = <1>;
++			siflower,reset-masks = <0x1>;
++		};
++
++		gpioclk: clock-controller@0ce0a004 {
++			compatible = "siflower,sf19a2890-periph-clk";
++			reg = <0x0 0x0ce0a004 0x0 0x4>;
++			clocks = <&topcrm CLK_APB>;
++			clock-output-names = "gpio";
++			#clock-cells = <1>;
++		};
++
++		uart0: uart@c300000 {
++			compatible = "arm,pl011", "arm,primecell";
++			reg = <0x0 0xc300000 0x0 0x1000>;
++			clocks = <&uartclk 2>, <&uartclk 0>;
++			clock-names = "uartclk", "apb_pclk";
++			resets = <&uartrst 0>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&uart0_pins>;
++			interrupts = <43 IRQ_TYPE_LEVEL_HIGH>;
++			current-speed = <115200>;
++			status = "disabled";
++		};
++
++		uart1: uart@c301000 {
++			compatible = "arm,pl011", "arm,primecell";
++			reg = <0x0 0xc301000 0x0 0x1000>;
++			clocks = <&uartclk 3>, <&uartclk 1>;
++			clock-names = "uartclk", "apb_pclk";
++			resets = <&uartrst 1>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&uart1_pins>;
++			interrupts = <44 IRQ_TYPE_LEVEL_HIGH>;
++			current-speed = <115200>;
++			status = "disabled";
++		};
++
++		spi0: spi@c200000 {
++			compatible = "siflower,sf21-qspi";
++			reg = <0x0 0xc200000 0x0 0x1000>;
++			clocks = <&spiclk 0>, <&spiclk 1>;
++			clock-names = "apb_pclk", "sspclk";
++			resets = <&spirst 0>;
++			interrupts = <39 IRQ_TYPE_LEVEL_HIGH>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&spi0_pins>;
++			status = "disabled";
++			#address-cells = <1>;
++			#size-cells = <0>;
++		};
++
++		spi1: spi@c201000 {
++			compatible = "siflower,sf21-qspi";
++			reg = <0x0 0xc201000 0x0 0x1000>;
++			clocks = <&spiclk 2>, <&spiclk 3>;
++			clock-names = "apb_pclk", "sspclk";
++			resets = <&spirst 1>;
++			interrupts = <40 IRQ_TYPE_LEVEL_HIGH>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&spi1_pins>;
++			status = "disabled";
++			#address-cells = <1>;
++			#size-cells = <0>;
++		};
++
++		watchdog: watchdog@0c700000 {
++			compatible = "snps,dw-wdt";
++			reg = <0x0 0x0c700000 0x0 0x1000>;
++			interrupts = <51 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&wdtclk 0>;
++			resets = <&wdtrst 0>;
++		};
++
++		usb_phy: phy@0ce02400 {
++			compatible = "siflower,sf21-usb-phy";
++			reg = <0x0 0x0ce02400 0x0 0x14>;
++			clocks = <&topcrm CLK_USBPHY>;
++			clock-names = "usb_phy_clk";
++			#phy-cells = <0>;
++			status = "disabled";
++		};
++
++		pcie_phy: phy@0d810000 {
++			compatible = "siflower,sf21-pcie-phy", "syscon";
++			reg = <0x0 0x0d810000 0x0 0x100>;
++			clocks = <&topcrm CLK_PCIE_REFP>, <&topcrm CLK_SERDES_CSR>;
++			clock-names = "ref", "csr";
++			siflower,topcrm = <&topcrm>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			status = "disabled";
++
++			pcie_phy0: phy@0 {
++				reg = <0>;
++				siflower,num-lanes = <1>;
++				#phy-cells = <0>;
++			};
++
++			pcie_phy1: phy@1 {
++				reg = <1>;
++				siflower,num-lanes = <1>;
++				#phy-cells = <0>;
++			};
++		};
++
++		usb: usb@10000000 {
++			compatible = "siflower,sf19a2890-usb";
++			reg = <0x0 0x10000000 0x0 0x80000>;
++			interrupts = <33 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&topcrm CLK_USB>;
++			clock-names = "otg";
++			resets = <&reset SF21_RESET_USB>;
++			reset-names = "dwc2";
++			dr_mode = "host";
++			phys = <&usb_phy>;
++			phy-names = "usb2-phy";
++			g-rx-fifo-size = <512>;
++			g-np-tx-fifo-size = <128>;
++			g-tx-fifo-size = <128 128 128 128 128 128 128 128
++				16  16  16  16  16  16  16>;
++			status = "disabled";
++		};
++
++		iram: sram@1c000000 {
++			compatible = "mmio-sram";
++			reg = <0x0 0x1c000000 0x0 0x10000>;
++			clocks = <&topcrm CLK_IRAM>;
++			ranges;
++		};
++
++		xgmac0: ethernet@8000000 {
++			compatible = "siflower,sf21-xgmac";
++			reg = <0x0 0x8000000 0x0 0x4000>;
++			dmas = <&edma>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_SERDES_CSR>;
++			clock-names = "csr";
++			pcs-handle = <&qsgmii_pcs 0>;
++			phy-mode = "qsgmii";
++			pinctrl-names = "default";
++			pinctrl-0 = <&mac0_mdio_pins>;
++			interrupts = <176 IRQ_TYPE_LEVEL_HIGH>, <20 IRQ_TYPE_LEVEL_HIGH>, <26 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "lpi", "pmt";
++			status = "disabled";
++
++			mdio0: mdio {
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
++		xgmac1: ethernet@8004000 {
++			compatible = "siflower,sf21-xgmac";
++			reg = <0x0 0x8004000 0x0 0x4000>;
++			dmas = <&edma>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_SERDES_CSR>;
++			clock-names = "csr";
++			pcs-handle = <&qsgmii_pcs 1>;
++			phy-mode = "qsgmii";
++			interrupts = <1 IRQ_TYPE_LEVEL_HIGH>, <21 IRQ_TYPE_LEVEL_HIGH>, <27 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "lpi", "pmt";
++			status = "disabled";
++		};
++
++		xgmac2: ethernet@8008000 {
++			compatible = "siflower,sf21-xgmac";
++			reg = <0x0 0x8008000 0x0 0x4000>;
++			dmas = <&edma>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_SERDES_CSR>;
++			clock-names = "csr";
++			pcs-handle = <&qsgmii_pcs 2>;
++			phy-mode = "qsgmii";
++			interrupts = <2 IRQ_TYPE_LEVEL_HIGH>, <22 IRQ_TYPE_LEVEL_HIGH>, <28 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "lpi", "pmt";
++			status = "disabled";
++		};
++
++		xgmac3: ethernet@800c000 {
++			compatible = "siflower,sf21-xgmac";
++			reg = <0x0 0x800c000 0x0 0x4000>;
++			dmas = <&edma>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_SERDES_CSR>;
++			clock-names = "csr";
++			pcs-handle = <&qsgmii_pcs 3>;
++			phy-mode = "qsgmii";
++			interrupts = <3 IRQ_TYPE_LEVEL_HIGH>, <23 IRQ_TYPE_LEVEL_HIGH>, <29 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "lpi", "pmt";
++			status = "disabled";
++		};
++
++		xgmac4: ethernet@8010000 {
++			compatible = "siflower,sf21-xgmac";
++			reg = <0x0 0x8010000 0x0 0x4000>;
++			dmas = <&edma>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_SERDES_CSR>;
++			clock-names = "csr";
++			pcs-handle = <&sgmii_pcs 0>;
++			phy-mode = "2500base-x";
++			pinctrl-names = "default";
++			pinctrl-0 = <&mac4_mdio_pins>;
++			interrupts = <4 IRQ_TYPE_LEVEL_HIGH>, <24 IRQ_TYPE_LEVEL_HIGH>, <30 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "lpi", "pmt";
++			status = "disabled";
++
++			mdio1: mdio {
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++		};
++
++		edma: dma-controller@8018000 {
++			compatible = "siflower,sf21-xgmac-dma";
++			reg = <0x0 0x8018000 0x0 0x4000>;
++			#dma-cells = <0>;
++			ethsys = <&ethsys>;
++			iram = <&iram>;
++			clocks = <&topcrm CLK_AXI>, <&topcrm CLK_NPU>, <&topcrm CLK_SERDES_CSR>;
++			clock-names = "axi", "npu", "csr";
++			interrupts = <6 IRQ_TYPE_LEVEL_HIGH>, <9 IRQ_TYPE_LEVEL_HIGH>, <10 IRQ_TYPE_LEVEL_HIGH>, <11 IRQ_TYPE_LEVEL_HIGH>, <12 IRQ_TYPE_LEVEL_HIGH>, <13 IRQ_TYPE_LEVEL_HIGH>, <14 IRQ_TYPE_LEVEL_HIGH>, <15 IRQ_TYPE_LEVEL_HIGH>, <16 IRQ_TYPE_LEVEL_HIGH>, <17 IRQ_TYPE_LEVEL_HIGH>, <18 IRQ_TYPE_LEVEL_HIGH>, <19 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "tx0", "tx1", "tx2", "tx3", "tx4",
++					  "rx0", "rx1", "rx2", "rx3", "rx4", "rxovf";
++			status = "disabled";
++		};
++
++		qsgmii_pcs: xpcs@8800000 {
++			compatible = "siflower,sf21-xpcs";
++			reg = <0x0 0x8800000 0x0 0x800000>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_ETH_REF_P>, <&topcrm CLK_ETHTSU>, <&topcrm CLK_SERDES_CSR>;
++			clock-names = "ref", "eee", "csr";
++			interrupts = <7 IRQ_TYPE_LEVEL_HIGH>;
++			status = "disabled";
++		};
++
++		sgmii_pcs: xpcs@9000000 {
++			compatible = "siflower,sf21-xpcs";
++			reg = <0x0 0x9000000 0x0 0x800000>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_ETH_REF_P>, <&topcrm CLK_ETHTSU>, <&topcrm CLK_SERDES_CSR>;
++			clock-names = "ref", "eee", "csr";
++			interrupts = <8 IRQ_TYPE_LEVEL_HIGH>;
++			status = "disabled";
++		};
++
++		gpio: gpio@c800000 {
++			compatible = "siflower,sf19a2890-gpio";
++			reg = <0x0 0xc800000 0x0 0x100000>;
++
++			gpio-controller;
++			#gpio-cells = <2>;
++
++			interrupts = <54 IRQ_TYPE_LEVEL_HIGH>, <55 IRQ_TYPE_LEVEL_HIGH>, <56 IRQ_TYPE_LEVEL_HIGH>, <57 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-controller;
++			#interrupt-cells = <2>;
++			clocks = <&gpioclk 0>;
++			resets = <&gpiorst 0>;
++
++			ngpios = <41>;
++			gpio-ranges = <&iomux 0 0 41>;
++		};
++
++		i2c0: i2c@c100000 {
++			compatible = "snps,designware-i2c";
++			reg = <0x0 0xc100000 0x0 0x1000>;
++			clocks = <&i2cclk 0>;
++			clock-names = "ref";
++			clock-frequency = <400000>;
++			interrupts = <35 IRQ_TYPE_LEVEL_HIGH>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			pinctrl-names="default";
++			pinctrl-0 = <&i2c0_pins>;
++			resets = <&i2crst 0>;
++			status = "disabled";
++		};
++
++		i2c1: i2c@c101000 {
++			compatible = "snps,designware-i2c";
++			reg = <0x0 0xc101000 0x0 0x1000>;
++			clocks = <&i2cclk 1>;
++			clock-frequency = <400000>;
++			interrupts = <36 IRQ_TYPE_LEVEL_HIGH>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&i2c1_pins>;
++			resets = <&i2crst 1>;
++			status = "disabled";
++		};
++
++		ethsys: syscon@ce01800 {
++			compatible = "siflower,ethsys", "syscon";
++			reg = <0x0 0xce01800 0x0 0x800>;
++		};
++
++		dpns: dpns@11000000 {
++			compatible = "siflower,sf21-dpns";
++			reg = <0x0 0x11000000 0x0 0x1000000>;
++			#address-cells = <1>;
++			dma-ranges = <0 0x0 0 0x20000000 0 0x80000000>;
++			interrupts = <65 IRQ_TYPE_EDGE_RISING>, <66 IRQ_TYPE_EDGE_RISING>, <67 IRQ_TYPE_EDGE_RISING>, <68 IRQ_TYPE_EDGE_RISING>, <69 IRQ_TYPE_EDGE_RISING>, <70 IRQ_TYPE_EDGE_RISING>, <71 IRQ_TYPE_EDGE_RISING>, <72 IRQ_TYPE_EDGE_RISING>,
++				     <73 IRQ_TYPE_EDGE_RISING>, <74 IRQ_TYPE_EDGE_RISING>, <75 IRQ_TYPE_EDGE_RISING>, <76 IRQ_TYPE_EDGE_RISING>, <77 IRQ_TYPE_EDGE_RISING>, <78 IRQ_TYPE_EDGE_RISING>, <79 IRQ_TYPE_EDGE_RISING>, <80 IRQ_TYPE_EDGE_RISING>,
++				     <81 IRQ_TYPE_EDGE_RISING>, <82 IRQ_TYPE_EDGE_RISING>, <83 IRQ_TYPE_EDGE_RISING>, <84 IRQ_TYPE_EDGE_RISING>, <85 IRQ_TYPE_LEVEL_HIGH>, <86 IRQ_TYPE_LEVEL_HIGH>, <87 IRQ_TYPE_EDGE_RISING>, <88 IRQ_TYPE_EDGE_RISING>,
++				     <89 IRQ_TYPE_EDGE_RISING>, <90 IRQ_TYPE_EDGE_RISING>, <91 IRQ_TYPE_EDGE_RISING>, <92 IRQ_TYPE_EDGE_RISING>, <93 IRQ_TYPE_EDGE_RISING>, <94 IRQ_TYPE_EDGE_RISING>, <95 IRQ_TYPE_EDGE_RISING>, <96 IRQ_TYPE_EDGE_RISING>,
++				     <97 IRQ_TYPE_EDGE_RISING>, <98 IRQ_TYPE_EDGE_RISING>, <99 IRQ_TYPE_EDGE_RISING>, <100 IRQ_TYPE_EDGE_RISING>, <101 IRQ_TYPE_EDGE_RISING>, <102 IRQ_TYPE_EDGE_RISING>, <103 IRQ_TYPE_EDGE_RISING>, <104 IRQ_TYPE_EDGE_RISING>,
++				     <105 IRQ_TYPE_EDGE_RISING>, <106 IRQ_TYPE_EDGE_RISING>, <107 IRQ_TYPE_EDGE_RISING>, <108 IRQ_TYPE_EDGE_RISING>, <109 IRQ_TYPE_EDGE_RISING>, <110 IRQ_TYPE_EDGE_RISING>, <111 IRQ_TYPE_EDGE_RISING>, <112 IRQ_TYPE_EDGE_RISING>,
++				     <113 IRQ_TYPE_EDGE_RISING>, <114 IRQ_TYPE_EDGE_RISING>, <115 IRQ_TYPE_EDGE_RISING>, <116 IRQ_TYPE_EDGE_RISING>, <117 IRQ_TYPE_EDGE_RISING>, <118 IRQ_TYPE_EDGE_RISING>, <119 IRQ_TYPE_EDGE_RISING>, <120 IRQ_TYPE_EDGE_RISING>,
++				     <121 IRQ_TYPE_EDGE_RISING>, <122 IRQ_TYPE_EDGE_RISING>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_NPU>;
++			resets = <&reset SF21_RESET_NPU>, <&reset SF21_RESET_NPU2DDR_ASYNCBRIDGE>;
++			reset-names = "npu", "npu2ddr";
++			siflower,edma = <&edma>;
++			status = "disabled";
++		};
++
++		syscon@ce00000 {
++			compatible = "siflower,brom-sysm";
++			reg = <0x0 0xce00000 0x0 0x400>;
++			#reset-cells = <1>;
++		};
++
++		syscon@ce00c00 {
++			compatible = "siflower,cpu-sysm";
++			reg = <0x0 0xce00c00 0x0 0x400>;
++		};
++
++		iomux: iomux@ce3c000 {
++			compatible = "pinconf-single";
++			reg = <0x0 0xce3c000 0x0 0xa4>;
++			#pinctrl-cells = <1>;
++
++			pinctrl-single,register-width = <32>;
++			pinctrl-single,function-mask = <FUNC_MODE_MASK>;
++			pinctrl-single,function-off = <0>;
++			pinctrl-single,gpio-range = <&range 0 41 GPIO_MODE>;
++
++			range: gpio-range {
++				#pinctrl-single,gpio-range-cells = <3>;
++			};
++
++			clk_pins: clk_pins {
++				pinctrl-single,pins = <
++					EXT_CLK_IN	FUNC_MODE0
++					CLK_OUT		FUNC_MODE0
++				>;
++			};
++
++			spi0_pins: spi0_pins {
++				pinctrl-single,pins = <
++					SPI0_TXD	FUNC_MODE0
++					SPI0_RXD	FUNC_MODE0
++					SPI0_CLK	FUNC_MODE0
++					SPI0_CSN	FUNC_MODE0
++					SPI0_HOLD	FUNC_MODE0
++					SPI0_WP		FUNC_MODE0
++				>;
++			};
++
++			jtag_pins: jtag_pins {
++				pinctrl-single,pins = <
++					JTAG_TDO	FUNC_MODE0
++					JTAG_TDI	FUNC_MODE0
++					JTAG_TMS	FUNC_MODE0
++					JTAG_TCK	FUNC_MODE0
++					JTAG_RST	FUNC_MODE0
++				>;
++			};
++
++			uart0_pins: uart0_pins {
++				pinctrl-single,pins = <
++					JTAG_TDO	FUNC_MODE1
++					JTAG_TDI	FUNC_MODE1
++					JTAG_TMS	FUNC_MODE1
++					JTAG_TCK	FUNC_MODE1
++				>;
++			};
++
++			uart1_pins: uart1_pins {
++				pinctrl-single,pins = <
++					UART1_TX	FUNC_MODE0
++					UART1_RX	FUNC_MODE0
++				>;
++			};
++
++			uart1_full_pins: uart1_full_pins {
++				pinctrl-single,pins = <
++					UART1_TX	FUNC_MODE0
++					UART1_RX	FUNC_MODE0
++					I2C0_DAT	FUNC_MODE1
++					I2C0_CLK	FUNC_MODE1
++				>;
++			};
++
++			i2c0_pins: i2c0_pins {
++				pinctrl-single,pins = <
++					I2C0_DAT	FUNC_MODE0
++					I2C0_CLK	FUNC_MODE0
++				>;
++			};
++
++			perst_pins: perst_pins {
++				pinctrl-single,pins = <
++					I2C0_DAT	FUNC_MODE2
++					I2C0_CLK	FUNC_MODE2
++				>;
++			};
++
++			i2c1_pins: i2c1_pins {
++				pinctrl-single,pins = <
++					I2C1_DAT	FUNC_MODE0
++					I2C1_CLK	FUNC_MODE0
++				>;
++			};
++
++			rgmii_pins: rgmii_pins {
++				pinctrl-single,pins = <
++					RGMII_GTX_CLK	FUNC_MODE0
++					RGMII_TXD0	FUNC_MODE0
++					RGMII_TXD1	FUNC_MODE0
++					RGMII_TXD2	FUNC_MODE0
++					RGMII_TXD3	FUNC_MODE0
++					RGMII_TXCTL	FUNC_MODE0
++					RGMII_RXCLK	FUNC_MODE0
++					RGMII_RXD0	FUNC_MODE0
++					RGMII_RXD1	FUNC_MODE0
++					RGMII_RXD2	FUNC_MODE0
++					RGMII_RXD3	FUNC_MODE0
++					RGMII_RXCTL	FUNC_MODE0
++				>;
++			};
++
++			spi1_pins: spi1_pins {
++				pinctrl-single,pins = <
++					RGMII_GTX_CLK	FUNC_MODE1
++					RGMII_TXCLK	FUNC_MODE1
++					RGMII_TXD0	FUNC_MODE1
++					RGMII_TXD1	FUNC_MODE1
++					RGMII_TXD2	FUNC_MODE1
++					RGMII_TXD3	FUNC_MODE1
++				>;
++			};
++
++			mac0_mdio_pins: mac0_mdio_pins {
++				pinctrl-single,pins = <
++					QSGMII_MDIO	FUNC_MODE0
++					QSGMII_MDC	FUNC_MODE0
++				>;
++			};
++
++			mac4_mdio_pins: mac4_mdio_pins {
++				pinctrl-single,pins = <
++					SXGMII_MDIO	FUNC_MODE0
++					SXGMII_MDC	FUNC_MODE0
++				>;
++			};
++		};
++
++		plic: interrupt-controller@108000000 {
++			compatible = "thead,c900-plic";
++			reg = <0x1 0x8000000 0x0 0x400000>, <0x0 0x0ce00c34 0x0 0x20>;
++			interrupt-controller;
++			interrupts-extended = <&cpu0_intc 11>, <&cpu0_intc 9>,
++					      <&cpu1_intc 11>, <&cpu1_intc 9>,
++					      <&cpu2_intc 11>, <&cpu2_intc 9>,
++					      <&cpu3_intc 11>, <&cpu3_intc 9>;
++			#interrupt-cells = <2>;
++			riscv,ndev = <176>;
++		};
++
++		interrupt-controller@10c000000 {
++			compatible = "thead,c900-aclint-mswi";
++			reg = <0x1 0xc000000 0x0 0x4000>;
++			interrupts-extended = <&cpu0_intc 3>, <&cpu1_intc 3>,
++					      <&cpu2_intc 3>, <&cpu3_intc 3>;
++		};
++
++		timer@10c004000 {
++			compatible = "thead,c900-aclint-mtimer";
++			reg = <0x1 0xc00bff8 0x0 0x8>, <0x1 0xc004000 0x0 0x7ff8>;
++			interrupts-extended = <&cpu0_intc 7>, <&cpu1_intc 7>,
++					      <&cpu2_intc 7>, <&cpu3_intc 7>;
++		};
++
++		interrupt-controller@10c00c000 {
++			compatible = "thead,c900-aclint-sswi";
++			reg = <0x1 0xc00c000 0x0 0x1000>;
++			interrupts-extended = <&cpu0_intc 1>, <&cpu1_intc 1>,
++					      <&cpu2_intc 1>, <&cpu3_intc 1>;
++		};
++	};
++};
+diff --git a/arch/riscv/boot/dts/siflower/sf21a6826.dtsi b/arch/riscv/boot/dts/siflower/sf21a6826.dtsi
+new file mode 100644
+index 000000000000..bddf506cf9a2
+--- /dev/null
++++ b/arch/riscv/boot/dts/siflower/sf21a6826.dtsi
+@@ -0,0 +1,23 @@
++#include "sf21.dtsi"
++/ {
++	compatible = "siflower,sf21a6826";
++};
++
++&cpus {
++	timebase-frequency = <1125000000>;
++};
++
++&topcrm {
++	assigned-clocks = <&topcrm CLK_CMNPLL_VCO>, <&topcrm CLK_PIC>, <&topcrm CLK_AXI>,
++		<&topcrm CLK_AHB>, <&topcrm CLK_APB>, <&topcrm CLK_UART>,
++		<&topcrm CLK_IRAM>, <&topcrm CLK_NPU>, <&topcrm CLK_ETHTSU>,
++		<&topcrm CLK_GMAC_BYP_REF>, <&topcrm CLK_USB>, <&topcrm CLK_USBPHY>,
++		<&topcrm CLK_SERDES_CSR>, <&topcrm CLK_CRYPT_CSR>, <&topcrm CLK_CRYPT_APP>,
++		<&topcrm CLK_IROM>;
++	assigned-clock-rates = <2250000000>, <562500000>, <375000000>,
++		<281250000>, <187500000>, <93750000>,
++		<562500000>, <562500000>, <93750000>,
++		<250000000>, <250000000>, <50000000>,
++		<93750000>, <75000000>, <375000000>,
++		<375000000>;
++};
+diff --git a/arch/riscv/boot/dts/siflower/sf21h8898.dtsi b/arch/riscv/boot/dts/siflower/sf21h8898.dtsi
+new file mode 100644
+index 000000000000..4e916f60a1c5
+--- /dev/null
++++ b/arch/riscv/boot/dts/siflower/sf21h8898.dtsi
+@@ -0,0 +1,39 @@
++#include "sf21.dtsi"
++/ {
++	compatible = "siflower,sf21h8898";
++	soc {
++		xgmac5: ethernet@8014000 {
++			compatible = "siflower,sf21-xgmac";
++			reg = <0x0 0x8014000 0x0 0x4000>;
++			dmas = <&edma>;
++			ethsys = <&ethsys>;
++			clocks = <&topcrm CLK_SERDES_CSR>, <&topcrm CLK_GMAC_BYP_REF>;
++			clock-names = "csr", "rgmii";
++			phy-mode = "rgmii";
++			pinctrl-names = "default";
++			pinctrl-0 = <&rgmii_pins>;
++			interrupts = <5 IRQ_TYPE_LEVEL_HIGH>, <25 IRQ_TYPE_LEVEL_HIGH>, <31 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "sbd", "lpi", "pmt";
++			status = "disabled";
++		};
++	};
++};
++
++&cpus {
++	timebase-frequency = <1250000000>;
++};
++
++&topcrm {
++	assigned-clocks = <&topcrm CLK_CMNPLL_VCO>, <&topcrm CLK_PIC>, <&topcrm CLK_AXI>,
++		<&topcrm CLK_AHB>, <&topcrm CLK_APB>, <&topcrm CLK_UART>,
++		<&topcrm CLK_IRAM>, <&topcrm CLK_NPU>, <&topcrm CLK_ETHTSU>,
++		<&topcrm CLK_GMAC_BYP_REF>, <&topcrm CLK_USB>, <&topcrm CLK_USBPHY>,
++		<&topcrm CLK_SERDES_CSR>, <&topcrm CLK_CRYPT_CSR>, <&topcrm CLK_CRYPT_APP>,
++		<&topcrm CLK_IROM>;
++	assigned-clock-rates = <2500000000>, <416666666>, <416666666>,
++		<250000000>, <178571428>, <89285714>,
++		<416666666>, <416666666>, <89285714>,
++		<250000000>, <250000000>, <50000000>,
++		<89285714>, <73529411>, <312500000>,
++		<312500000>;
++};
+diff --git a/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nand.dts b/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nand.dts
+new file mode 100644
+index 000000000000..67fa01074e12
+--- /dev/null
++++ b/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nand.dts
+@@ -0,0 +1,90 @@
++/dts-v1/;
++#include "sf21h8898_bananapi_bpi-rv2.dtsi"
++
++/ {
++	model = "Bananapi BPI-RV2 (Booting from NAND)";
++	compatible = "bananapi,bpi-rv2-nand", "siflower,sf21h8898";
++};
++
++&spi0 {
++	status = "okay";
++	num-cs = <2>;
++	cs-gpios = <&gpio 5 GPIO_ACTIVE_LOW>, <&gpio 36 GPIO_ACTIVE_LOW>;
++
++	flash@0 {
++		compatible = "spi-nand";
++		reg = <0>;
++		spi-max-frequency = <35000000>;
++		spi-tx-bus-width = <2>;
++		spi-rx-bus-width = <2>;
++
++	        partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "fbl";
++				reg = <0x0 0x20000>;
++			};
++
++			partition@20000 {
++				label = "ubi";
++				reg = <0x20000 0x0>;
++				compatible = "linux,ubi";
++
++				volumes {
++					factory: ubi-volume-factory {
++						volname = "factory";
++
++						nvmem-layout {
++							compatible = "fixed-layout";
++							#address-cells = <1>;
++							#size-cells = <1>;
++
++							macaddr_factory_0: macaddr@0 {
++								compatible = "mac-base";
++								reg = <0x0 0x6>;
++								#nvmem-cell-cells = <1>;
++							};
++						};
++					};
++
++					rootdisk: ubi-volume-fit {
++						volname = "fit";
++					};
++				};
++			};
++		};
++	};
++
++	flash@1 {
++		compatible = "jedec,spi-nor";
++		reg = <1>;
++		spi-max-frequency = <35000000>;
++		spi-tx-bus-width = <2>;
++		spi-rx-bus-width = <2>;
++
++	        partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "bootloader-nor";
++				reg = <0x0 0x90000>;
++				read-only;
++			};
++
++			partition@90000 {
++				label = "factory-nor";
++				reg = <0x90000 0x10000>;
++			};
++
++			partition@a0000 {
++				label = "firmware-nor";
++				reg = <0xa0000 0xf60000>;
++			};
++		};
++	};
++};
+diff --git a/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nor.dts b/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nor.dts
+new file mode 100644
+index 000000000000..761e13e7dfd3
+--- /dev/null
++++ b/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2-nor.dts
+@@ -0,0 +1,80 @@
++/dts-v1/;
++#include "sf21h8898_bananapi_bpi-rv2.dtsi"
++
++/ {
++	model = "Bananapi BPI-RV2 (Booting from NOR)";
++	compatible = "bananapi,bpi-rv2-nor", "siflower,sf21h8898";
++};
++
++&spi0 {
++	status = "okay";
++	num-cs = <2>;
++	cs-gpios = <&gpio 5 GPIO_ACTIVE_LOW>, <&gpio 36 GPIO_ACTIVE_LOW>;
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <35000000>;
++		spi-tx-bus-width = <2>;
++		spi-rx-bus-width = <2>;
++
++	        partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "bootloader";
++				reg = <0x0 0x90000>;
++				read-only;
++			};
++
++			factory: partition@90000 {
++				label = "factory";
++				reg = <0x90000 0x10000>;
++
++				nvmem-layout {
++					compatible = "fixed-layout";
++					#address-cells = <1>;
++					#size-cells = <1>;
++
++					macaddr_factory_0: macaddr@0 {
++						compatible = "mac-base";
++						reg = <0x0 0x6>;
++						#nvmem-cell-cells = <1>;
++					};
++				};
++			};
++
++			rootdisk: partition@a0000 {
++				label = "firmware";
++				reg = <0xa0000 0xf60000>;
++				compatible = "denx,fit";
++			};
++		};
++	};
++
++	flash@1 {
++		compatible = "spi-nand";
++		reg = <1>;
++		spi-max-frequency = <35000000>;
++		spi-tx-bus-width = <2>;
++		spi-rx-bus-width = <2>;
++
++	        partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "fbl-nand";
++				reg = <0x0 0x20000>;
++			};
++
++			partition@20000 {
++				label = "ubi-nand";
++				reg = <0x20000 0x0>;
++			};
++		};
++	};
++};
+diff --git a/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2.dtsi b/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2.dtsi
+new file mode 100644
+index 000000000000..a40a1eb75b28
+--- /dev/null
++++ b/arch/riscv/boot/dts/siflower/sf21h8898_bananapi_bpi-rv2.dtsi
+@@ -0,0 +1,215 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/dts-v1/;
++#include "sf21h8898.dtsi"
++
++/ {
++	chosen {
++		bootargs = "root=/dev/fit0 rootwait";
++		stdout-path = "serial1:115200n8";
++		rootdisk = <&rootdisk>;
++	};
++
++	memory@20000000 {
++		device_type = "memory";
++		reg = <0x0 0x20000000 0x0 0x20000000>;
++	};
++
++	usb_vbus: regulator@0 {
++		compatible = "regulator-fixed";
++		regulator-name = "usb_vbus";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		gpios = <&gpio 37 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	m2keyb_pwren: regulator@1 {
++		compatible = "regulator-fixed";
++		regulator-name = "m2keyb_pwren";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpios = <&gpio 38 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
++	};
++};
++
++&spi0_pins {
++	pinctrl-single,pins = <
++		SPI0_TXD	FUNC_MODE0
++		SPI0_RXD	FUNC_MODE0
++		SPI0_CLK	FUNC_MODE0
++		SPI0_HOLD	FUNC_MODE0
++		SPI0_WP		FUNC_MODE0
++	>;
++};
++
++&watchdog {
++	status = "okay";
++};
++
++&uart1 {
++	status = "okay";
++};
++
++&iomux {
++	rtc_int_gpio: rtc-int-pins {
++		pinctrl-single,pins = <PHY_INT GPIO_MODE>;
++		// disable internal bias as it's externally (and weakly) pulled up
++		pinctrl-single,bias-pullup = <0 SW_PU 0 SW_PU>;
++		pinctrl-single,bias-pulldown = <0 SW_PD 0 SW_PD>;
++	};
++};
++
++&i2c0 {
++	status = "okay";
++
++	rtc: rtc@51 {
++		compatible = "analogtek,at8563", "nxp,pcf8563";
++		reg = <0x51>;
++		#clock-cells = <0>;
++		interrupts-extended = <&gpio 40 IRQ_TYPE_LEVEL_LOW>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&rtc_int_gpio>;
++	};
++};
++
++&xgmac0 {
++	status = "okay";
++	phy-handle = <&phy1>;
++	nvmem-cells = <&macaddr_factory_0 0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&xgmac1 {
++	status = "okay";
++	phy-handle = <&phy2>;
++	nvmem-cells = <&macaddr_factory_0 0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&xgmac2 {
++	status = "okay";
++	phy-handle = <&phy3>;
++	nvmem-cells = <&macaddr_factory_0 0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&xgmac3 {
++	status = "okay";
++	phy-handle = <&phy4>;
++	nvmem-cells = <&macaddr_factory_0 0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&xgmac4 {
++	status = "okay";
++	phy-handle = <&phy15>;
++	nvmem-cells = <&macaddr_factory_0 1>;
++	nvmem-cell-names = "mac-address";
++	mac-address-increment = <1>;
++	/delete-property/ pinctrl-0;
++};
++
++&xgmac5 {
++	status = "okay";
++	tx-internal-delay-ps = <2499>;
++	rx-internal-delay-ps = <1519>;
++	phy-mode = "rgmii-txid";
++	phy-handle = <&phy6>;
++	nvmem-cells = <&macaddr_factory_0 0>;
++	nvmem-cell-names = "mac-address";
++};
++
++&mdio0 {
++	reset-gpios = <&gpio 22 GPIO_ACTIVE_LOW>;
++	reset-delay-us = <10000>;
++	reset-post-delay-us = <100000>;
++
++	phy1: ethernet-phy@1 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0x1>;
++	};
++
++	phy2: ethernet-phy@2 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0x2>;
++	};
++
++	phy3: ethernet-phy@3 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0x3>;
++	};
++
++	phy4: ethernet-phy@4 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0x4>;
++	};
++
++	phy6: ethernet-phy@6 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0x6>;
++		reset-gpios = <&gpio 1 GPIO_ACTIVE_LOW>;
++		reset-assert-us = <10000>;
++		reset-deassert-us = <100000>;
++	};
++
++	phy15: ethernet-phy@f {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0xf>;
++		reset-gpios = <&gpio 39 GPIO_ACTIVE_LOW>;
++		reset-assert-us = <10000>;
++		reset-deassert-us = <100000>;
++	};
++};
++
++&pcie_phy {
++	status = "okay";
++};
++
++/*
++ * M.2 Key B slot. Other GPIO pins connected to the slot:
++ *  GPIO0: WAKEUP
++ *  GPIO8: W_DISABLE
++ *  GPIO10: CLKREQ_N
++ *  GPIO38: FULL_CARD_POFF
++ */
++&pcie0 {
++	reset-gpios = <&gpio 19 GPIO_ACTIVE_LOW>;
++	status = "okay";
++};
++
++/*
++ * MiniPCIE slot. Other GPIO pins connected to the slot:
++ *  GPIO11: PEWAKE
++ *  GPIO12: CLKREQ_N
++ */
++&pcie1 {
++	reset-gpios = <&gpio 9 GPIO_ACTIVE_LOW>;
++	status = "okay";
++};
++
++&usb_phy {
++	status = "okay";
++};
++
++&usb {
++	vbus-supply = <&usb_vbus>;
++	status = "okay";
++};
++
++&dpns {
++	status = "okay";
++};
++
++&edma {
++	status = "okay";
++};
++
++&qsgmii_pcs {
++	status = "okay";
++};
++
++&sgmii_pcs {
++	status = "okay";
++};
+-- 
+2.49.0
+

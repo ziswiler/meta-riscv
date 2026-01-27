@@ -1,0 +1,45 @@
+From 96c796bcfbe209f1a501873cbf8792a81bdfe3e9 Mon Sep 17 00:00:00 2001
+Message-ID: <96c796bcfbe209f1a501873cbf8792a81bdfe3e9.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: "haoming.chen" <haoming.chen@siflower.com.cn>
+Date: Thu, 7 Nov 2024 20:18:59 +0800
+Subject: [PATCH 14/18] net: phy: add support for Siflower SF23P1211 &
+ SF23P1240
+
+Signed-off-by: haoming.chen <haoming.chen@siflower.com.cn>
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ drivers/net/phy/Kconfig  | 5 +++++
+ drivers/net/phy/Makefile | 1 +
+ 2 files changed, 6 insertions(+)
+
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 01b235b3bb7e..7809d872266e 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -373,6 +373,11 @@ config ROCKCHIP_PHY
+ 	help
+ 	  Currently supports the integrated Ethernet PHY.
+ 
++config SIFLOWER_PHY
++	tristate "Siflower PHYs"
++	help
++	  Currently supports the SF23P1211 and SF23P1240 gigabit PHYs.
++
+ config SMSC_PHY
+ 	tristate "SMSC PHYs"
+ 	select CRC16
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index 90f886844381..3a113dca4b4f 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -103,3 +103,4 @@ obj-$(CONFIG_STE10XP)		+= ste10Xp.o
+ obj-$(CONFIG_TERANETICS_PHY)	+= teranetics.o
+ obj-$(CONFIG_VITESSE_PHY)	+= vitesse.o
+ obj-$(CONFIG_XILINX_GMII2RGMII) += xilinx_gmii2rgmii.o
++obj-$(CONFIG_SIFLOWER_PHY)	+= siflower.o
+-- 
+2.49.0
+

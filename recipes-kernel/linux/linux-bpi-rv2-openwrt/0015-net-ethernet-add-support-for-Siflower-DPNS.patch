@@ -1,0 +1,41 @@
+From 242f84f8aba6b12d13d689e6a293069662467728 Mon Sep 17 00:00:00 2001
+Message-ID: <242f84f8aba6b12d13d689e6a293069662467728.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: "haoming.chen" <haoming.chen@siflower.com.cn>
+Date: Tue, 26 Nov 2024 16:38:13 +0800
+Subject: [PATCH 15/18] net: ethernet: add support for Siflower DPNS
+
+Change-Id: Ie8fc30e4714eaa666563b1a85e22d0eb8ee778b5
+Signed-off-by: haoming.chen <haoming.chen@siflower.com.cn>
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ drivers/net/ethernet/Kconfig  | 1 +
+ drivers/net/ethernet/Makefile | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index 9a542e3c9b05..9e43884cbe3d 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -201,5 +201,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
+ source "drivers/net/ethernet/wiznet/Kconfig"
+ source "drivers/net/ethernet/xilinx/Kconfig"
+ source "drivers/net/ethernet/xircom/Kconfig"
++source "drivers/net/ethernet/siflower/Kconfig"
+ 
+ endif # ETHERNET
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 99fa180dedb8..2d121bc39e74 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -105,4 +105,5 @@ obj-$(CONFIG_NET_VENDOR_XILINX) += xilinx/
+ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
+ obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
+ obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
++obj-$(CONFIG_NET_VENDOR_SIFLOWER) += siflower/
+ obj-$(CONFIG_OA_TC6) += oa_tc6.o
+-- 
+2.49.0
+

@@ -1,0 +1,46 @@
+From 0884e3413698e78e813c441f7a48cbfdbf4050f0 Mon Sep 17 00:00:00 2001
+Message-ID: <0884e3413698e78e813c441f7a48cbfdbf4050f0.1769423703.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+References: <c9509fefa689efbde7dbcee2ae48d1d8dd6b76d6.1769423703.git.marcel.ziswiler@codethink.co.uk>
+From: Chuanhong Guo <gch981213@gmail.com>
+Date: Mon, 9 Sep 2024 16:46:53 +0800
+Subject: [PATCH 07/18] usb: dwc2: add support for Siflower SF19A2890
+
+Signed-off-by: Chuanhong Guo <gch981213@gmail.com>
+
+Upstream-Status: Pending [https://github.com/openwrt/openwrt/commit/b8a8bf53e94c07b4c2cb85005d9598f9f6d7b87e]
+---
+ drivers/usb/dwc2/params.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/usb/dwc2/params.c b/drivers/usb/dwc2/params.c
+index 4d73fae80b12..640fabdd421e 100644
+--- a/drivers/usb/dwc2/params.c
++++ b/drivers/usb/dwc2/params.c
+@@ -237,6 +237,14 @@ static void dwc2_set_cv1800_params(struct dwc2_hsotg *hsotg)
+ 	p->power_down = DWC2_POWER_DOWN_PARAM_NONE;
+ }
+ 
++static void dwc2_set_sf19a2890_params(struct dwc2_hsotg *hsotg)
++{
++	struct dwc2_core_params *p = &hsotg->params;
++
++	p->max_transfer_size = 65535;
++	p->ahbcfg = GAHBCFG_HBSTLEN_INCR4 << GAHBCFG_HBSTLEN_SHIFT;
++}
++
+ static void dwc2_set_stm32f4x9_fsotg_params(struct dwc2_hsotg *hsotg)
+ {
+ 	struct dwc2_core_params *p = &hsotg->params;
+@@ -336,6 +344,8 @@ const struct of_device_id dwc2_of_match_table[] = {
+ 	{ .compatible = "apm,apm82181-dwc-otg", .data = dwc2_set_amcc_params },
+ 	{ .compatible = "sophgo,cv1800-usb",
+ 	  .data = dwc2_set_cv1800_params },
++	{ .compatible = "siflower,sf19a2890-usb",
++	  .data = dwc2_set_sf19a2890_params },
+ 	{ .compatible = "st,stm32f4x9-fsotg",
+ 	  .data = dwc2_set_stm32f4x9_fsotg_params },
+ 	{ .compatible = "st,stm32f4x9-hsotg" },
+-- 
+2.49.0
+
