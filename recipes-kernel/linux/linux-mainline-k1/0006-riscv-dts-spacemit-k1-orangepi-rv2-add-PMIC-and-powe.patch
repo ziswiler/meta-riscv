@@ -1,0 +1,90 @@
+From 995271df079c22dcde58f046ab33cfc441b665a7 Mon Sep 17 00:00:00 2001
+Message-ID: <995271df079c22dcde58f046ab33cfc441b665a7.1773307795.git.marcel@ziswiler.com>
+In-Reply-To: <e79827abacd9be79a8ae2311efc975d0808d4c4c.1773307795.git.marcel@ziswiler.com>
+References: <e79827abacd9be79a8ae2311efc975d0808d4c4c.1773307795.git.marcel@ziswiler.com>
+From: Iker Pedrosa <ikerpedrosam@gmail.com>
+Date: Mon, 9 Mar 2026 12:40:16 +0100
+Subject: [PATCH 6/7] riscv: dts: spacemit: k1-orangepi-rv2: add PMIC and power
+ infrastructure
+
+Add Spacemit P1 PMIC configuration and board power infrastructure for
+voltage regulation support.
+
+- Add board power regulators (12V input, 4V rail)
+- Enable I2C8 for PMIC communication
+- Configure PMIC with buck4 (vmmc) and aldo1 (vqmmc) regulators
+- Set up regulator constraints for SD card operation
+
+Signed-off-by: Iker Pedrosa <ikerpedrosam@gmail.com>
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20260309-orangepi-sd-card-uhs-v2-6-5bb2b574df5d@gmail.com]
+---
+ .../boot/dts/spacemit/k1-orangepi-rv2.dts     | 48 +++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/arch/riscv/boot/dts/spacemit/k1-orangepi-rv2.dts b/arch/riscv/boot/dts/spacemit/k1-orangepi-rv2.dts
+index 41dc8e35e6eb..fbfd43f6e0e3 100644
+--- a/arch/riscv/boot/dts/spacemit/k1-orangepi-rv2.dts
++++ b/arch/riscv/boot/dts/spacemit/k1-orangepi-rv2.dts
+@@ -19,6 +19,25 @@ aliases {
+ 		ethernet1 = &eth1;
+ 	};
+ 
++	reg_dc_in: dc-in-12v {
++		compatible = "regulator-fixed";
++		regulator-name = "dc_in_12v";
++		regulator-min-microvolt = <12000000>;
++		regulator-max-microvolt = <12000000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
++	reg_vcc_4v: vcc-4v {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc_4v";
++		regulator-min-microvolt = <4000000>;
++		regulator-max-microvolt = <4000000>;
++		regulator-boot-on;
++		regulator-always-on;
++		vin-supply = <&reg_dc_in>;
++	};
++
+ 	chosen {
+ 		stdout-path = "serial0";
+ 	};
+@@ -90,3 +109,32 @@ &uart0 {
+ 	pinctrl-0 = <&uart0_2_cfg>;
+ 	status = "okay";
+ };
++
++&i2c8 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c8_cfg>;
++	status = "okay";
++
++	pmic@41 {
++		compatible = "spacemit,p1";
++		reg = <0x41>;
++		interrupts = <64>;
++		vin-supply = <&reg_vcc_4v>;
++
++		regulators {
++			sd_vmmc: buck4 {
++				regulator-min-microvolt = <500000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-ramp-delay = <5000>;
++				regulator-always-on;
++			};
++
++			sd_vqmmc: aldo1 {
++				regulator-min-microvolt = <500000>;
++				regulator-max-microvolt = <3400000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++		};
++	};
++};
+-- 
+2.53.0
+
