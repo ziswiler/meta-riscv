@@ -1,0 +1,49 @@
+From 94d3f440e19bf73d45d5fab70d64d1d6902fcd6a Mon Sep 17 00:00:00 2001
+Message-ID: <94d3f440e19bf73d45d5fab70d64d1d6902fcd6a.1791939536.git.marcel.ziswiler@codethink.co.uk>
+In-Reply-To: <cover.1791939536.git.marcel.ziswiler@codethink.co.uk>
+References: <cover.1791939536.git.marcel.ziswiler@codethink.co.uk>
+From: Marcel Ziswiler <marcel.ziswiler@codethink.co.uk>
+Date: Wed, 14 Oct 2026 02:56:09 +0200
+Subject: [PATCH 1/1] a210_defconfig: fix undefined reference
+
+  LD      .tmp_vmlinux.kallsyms1
+/var/home/sumo/Sources/riscv-yocto/build/tmp/work/zhihe_a210_dev-poky-linux/linux-zhihe-a210-dev/6.6.0+git/recipe-sys
+root-native/usr/bin/riscv64-poky-linux/riscv64-poky-linux-ld.bfd: drivers/firmware/thead/th1520_aon.o: in function `t
+h1520_aon_probe':
+/usr/src/kernel/drivers/firmware/thead/th1520_aon.c:294:(.text+0x4b4): undefined reference to `th1520_create_panic_lo
+g_proc'
+/var/home/sumo/Sources/riscv-yocto/build/tmp/work/zhihe_a210_dev-poky-linux/linux-zhihe-a210-dev/6.6.0+git/recipe-sys
+root-native/usr/bin/riscv64-poky-linux/riscv64-poky-linux-ld.bfd: drivers/rpmsg/th1520_rpmsg.o: in function `th1520_r
+pmsg_probe':
+/usr/src/kernel/drivers/rpmsg/th1520_rpmsg.c:722:(.text+0x131c): undefined reference to `th1520_create_panic_log_proc
+'
+make[2]: *** [/var/home/sumo/Sources/riscv-yocto/build/tmp/work-shared/zhihe-a210-dev/kernel-source/scripts/Makefile.
+vmlinux:36: vmlinux] Error 1
+make[1]: *** [/var/home/sumo/Sources/riscv-yocto/build/tmp/work-shared/zhihe-a210-dev/kernel-source/Makefile:1165: vm
+linux] Error 2
+make: *** [/var/home/sumo/Sources/riscv-yocto/build/tmp/work-shared/zhihe-a210-dev/kernel-source/Makefile:234: __sub-
+make] Error 2
+ERROR: oe_runmake failed
+
+Upstream-Status: Inappropriate [Downstream-specific]
+
+Signed-off-by: Marcel Ziswiler <marcel.ziswiler@codethink.co.uk>
+---
+ arch/riscv/configs/a210_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/riscv/configs/a210_defconfig b/arch/riscv/configs/a210_defconfig
+index ed05ba026dcb..a673d8aaa132 100644
+--- a/arch/riscv/configs/a210_defconfig
++++ b/arch/riscv/configs/a210_defconfig
+@@ -538,6 +538,7 @@ CONFIG_FW_LOADER_COMPRESS_ZSTD=y
+ CONFIG_CONNECTOR=y
+ CONFIG_SYSFB_SIMPLEFB=y
+ CONFIG_EFI_VARS_PSTORE_DEFAULT_DISABLE=y
++CONFIG_TH1520_PROC_DEBUG=y
+ CONFIG_ZHIHE_PROC_DEBUG=y
+ CONFIG_MTD=y
+ CONFIG_MTD_TESTS=m
+-- 
+2.53.0
+
